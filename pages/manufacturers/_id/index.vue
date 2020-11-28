@@ -7,7 +7,7 @@
     <b-col v-show="products.length" lg="6" class="my-1">
       <b-form-group
         label="Filter"
-        label-cols-sm="3"
+        label-cols-sm="1"
         label-align-sm="right"
         label-size="sm"
         label-for="filterInput"
@@ -32,7 +32,7 @@
       v-if="products.length"
       :filter="filter"
       striped
-      over
+      hover
       :items="products"
       :fields="productsFields"
     >

@@ -21,6 +21,15 @@
           :state="isEmailValid"
         />
       </b-form-group>
+      <b-form-group id="password-input-group" label-for="password-input" label="Password">
+        <b-form-input
+          id="password-input"
+          v-model="formData.password"
+          :state="isPasswordValid"
+          required
+          type="password"
+        />
+      </b-form-group>
       <b-form-group id="contact-input-group" label-for="contact-input" label="Contact:" :invalid-feedback="invalidContactFeedback">
         <b-form-input
           id="contact-input"
@@ -58,6 +67,7 @@ export default {
     return {
       formData: {
         name: null,
+        password: null,
         email: null,
         contact: null,
         address: null
@@ -82,6 +92,17 @@ export default {
       }
 
       return this.invalidNameFeedback === ''
+    },
+    isPasswordValid () {
+      if (!this.formData.password) {
+        return null
+      }
+
+      const passwordLen = this.formData.password.length
+      if (passwordLen < 3 || passwordLen > 255) {
+        return false
+      }
+      return true
     },
     isEmailValid () {
       if (!this.formData.email) {
@@ -126,6 +147,9 @@ export default {
     },
     isFormValid () {
       if (!this.isNameValid) {
+        return false
+      }
+      if (!this.isPasswordValid) {
         return false
       }
       if (!this.isEmailValid) {
