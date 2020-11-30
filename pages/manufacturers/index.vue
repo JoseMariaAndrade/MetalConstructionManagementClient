@@ -3,10 +3,10 @@
     <b-container>
       <b-table striped over :items="designers" :fields="fields">
         <template v-slot:cell(actions)="row">
-          <nuxt-link class="btn btn-link" :to="`/designers/${row.item.id}`">
+          <nuxt-link class="btn btn-link" :to="`/designers/${row.item.name}`">
             Details
           </nuxt-link>
-          <nuxt-link class="btn btn-link" :to="`/designers/${row.item.id}/edit`">
+          <nuxt-link class="btn btn-link" :to="`/designers/${row.item.name}/edit`">
             Edit
           </nuxt-link>
         </template>
@@ -27,7 +27,7 @@ export default {
     }
   },
   created () {
-    this.$axios.$get('/api/designers')
+    this.$axios.$get('/api/manufacturers')
       .then((designers) => {
         this.designers = designers
       })
