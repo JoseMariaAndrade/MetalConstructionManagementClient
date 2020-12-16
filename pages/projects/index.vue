@@ -3,7 +3,7 @@
     <b-container>
       <b-table striped over :items="projects" :fields="fields">
         <template v-slot:cell(actions)="row">
-          <nuxt-link class="btn btn-info" :to="`/projects/${row.item.name}`">
+          <nuxt-link class="btn btn-link" :to="`/projects/${row.item.name}`">
             Details
           </nuxt-link>
           <button type="button" class="btn btn-danger" @click.prevent="deleteProject(row.item.name)">
@@ -22,7 +22,7 @@
 export default {
   data () {
     return {
-      fields: ['name', 'client', 'designer', 'actions'],
+      fields: ['name', 'nameClient', 'nameDesigner', 'actions'],
       projects: []
     }
   },

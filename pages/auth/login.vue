@@ -1,12 +1,12 @@
 <template>
   <b-container>
-    <h3>Login into Metal Construction Management</h3>
     <b-form @submit.prevent="onSubmit" @reset="onReset">
-      <b-form-group label="Name" description="Enter your name">
+      <b-form-group label="E-mail" description="Enter your e-mail">
         <b-input
-          v-model.trim="name"
-          name="name"
-          placeholder="Your name"
+          v-model.trim="email"
+          name="email"
+          type="email"
+          placeholder="Your E-mail"
           required
         />
       </b-form-group>
@@ -15,7 +15,7 @@
           v-model="password"
           name="password"
           type="password"
-          placeholder="Your password"
+          placeholder="Your Password"
           required
         />
       </b-form-group>
@@ -34,46 +34,42 @@ export default {
   auth: false,
   data () {
     return {
-      name: null,
+      email: null,
       password: null
     }
   },
   methods: {
-    onLogin () {
-      this.$toast.success('You are logged in!').goAway(3000)
-
-      console.log(this.$auth.loggedIn)
-      const user = this.$auth.user
-      const groups = user.groups
-
-      const role = groups[0]
-
-      if (role === 'Client') {
-        this.$router.push(`/clients/${user.sub}`)
-      } else if (role === 'Administrator') {
-        this.$router.push('/administrator')
-      } else if (role === 'Designer') {
-        this.$router.push(`/designers/${user.sub}`)
-      } else if (role === 'Manufacturer') {
-        this.$router.push(`/manufacturers/${user.sub}`)
-      } else {
-        this.$router.push('/')
-      }
-    },
     onSubmit () {
       const promise = this.$auth.loginWith('local', {
         data: {
-          name: this.name,
+          email: this.email,
           password: this.password
         }
       })
-
-      promise.then(this.onLogin)
+      promise.then(() => {
+        this.$toast.success('You are logged in!').goAway(1000)
+        const userID = this.$auth.user.subID
+        if (this.$auth.user.groups.includes('Client')) {
+          this.$router.push(`/clients/${userID}`)
+        } else if (this.$auth.user.groups.includes('Designer')) {
+          this.$router.push(`/designers/${userID}`)
+        } else if (this.$auth.user.groups.includes('Manufacturer')) {
+          this.$router.push(`/manufacturers/${userID}`)
+        } else if (this.$auth.user.groups.includes('Administrator')) {
+          this.$router.push('/families')
+        }
+      })
+      promise.catch(() => {
+        this.$toast.error('Sorry, you cant login. Ensure your credentials are correct').goAway(2000)
+      })
     },
     onReset () {
-      this.name = null
+      this.email = null
       this.password = null
     }
   }
 }
 </script>
+<style scoped>
+
+</style>

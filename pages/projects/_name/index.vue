@@ -52,6 +52,7 @@
     </nuxt-link>
   </b-container>
 </template>
+
 <script>
 export default {
   data () {
