@@ -13,6 +13,11 @@
       :items="projects"
       :fields="projectsFields"
     >
+      <template v-slot:cell(decision)="row">
+        <b-icon-question-circle-fill v-if="row.item.decision==null" />
+        <b-icon-check-circle-fill v-if="row.item.decision===true" variant="success" />
+        <b-icon-x-circle-fill v-if="row.item.decision===false" variant="danger" />
+      </template>
       <template v-slot:cell(actions)="row">
         <nuxt-link class="btn btn-link" :to="`/clients/${id}/project/${row.item.name}`">
           Details
@@ -28,7 +33,13 @@
   </b-container>
 </template>
 <script>
+import { BIconCheckCircleFill, BIconXCircleFill, BIconQuestionCircleFill } from 'bootstrap-vue'
 export default {
+  components: {
+    BIconCheckCircleFill,
+    BIconXCircleFill,
+    BIconQuestionCircleFill
+  },
   data () {
     return {
       client: {},

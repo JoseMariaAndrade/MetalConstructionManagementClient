@@ -16,7 +16,7 @@
       </template>
     </b-table>
     <p v-else>
-      No Porjects.
+      No Projects.
     </p>
     <nuxt-link to="/designers">
       Go Back

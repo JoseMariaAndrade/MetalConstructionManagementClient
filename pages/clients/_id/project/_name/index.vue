@@ -5,22 +5,14 @@
     <p>Client: {{ project.nameClient }}</p>
     <p>Designer: {{ project.nameDesigner }}</p>
     <p>
-<!--    <p v-show="showDecision">-->
-      Decision: {{ project.decision }}
+      Decision:
+      <b-icon-question-circle-fill v-if="project.decision==null" />
+      <b-icon-check-circle-fill v-if="project.decision===true" variant="success" />
+      <b-icon-x-circle-fill v-if="project.decision===false" variant="danger" />
     </p>
     <p>
-<!--    <p v-show="showDecision">-->
       Observation: {{ project.observation }}
     </p>
-    <form @submit.prevent="create">
-      <b-form-file v-model="formData.file" :state="Boolean(formData.file)" placeholder="Choose a file or drop it here..." drop-placeholder="Drop file here..." />
-      <div class="mt-3">
-        Selected file: {{ formData.file ? formData.file.name : '' }}
-      </div>
-      <b-button variant="success" @click.prevent="create">
-        CREATE
-      </b-button>
-    </form>
     <h4>Structures:</h4>
     <b-table
       v-if="structures.length"
@@ -38,6 +30,43 @@
     <p v-else>
       No Structures.
     </p>
+    <h4>Documents</h4>
+    <b-table
+      v-if="documents.length"
+      striped
+      hover
+      :items="documents"
+      :fields="documentsFields"
+    >
+      <template v-slot:cell(actions)="row">
+        <b-button
+          v-if="row.item.id"
+          size="sm"
+          class="mb-2"
+          @click="downloadFile(row.item)"
+        >
+          <b-icon-download v-if="row.item!=null" />
+        </b-button>
+        <b-icon-file-earmark-break-fill v-else />
+      </template>
+    </b-table>
+    <p v-else>
+      No Documents.
+    </p>
+    <form @submit.prevent="upload">
+      <b-form-file
+        v-model="file"
+        :state="hasFile"
+        placeholder="Choose a file or drop it here..."
+        drop-placeholder="Drop file here..."
+      />
+      <div class="mt-3">
+        Selected file: {{ file ? file.name : '' }}
+      </div>
+      <b-button type="submit" variant="success" :disabled="!hasFile">
+        Upload
+      </b-button>
+    </form>
     <nuxt-link class="btn btn-link" :to="`/clients/${id}/project/${name}/decision`">
       Details
     </nuxt-link>
@@ -47,14 +76,22 @@
   </b-container>
 </template>
 <script>
+import { BIconCheckCircleFill, BIconXCircleFill, BIconQuestionCircleFill, BIconDownload, BIconFileEarmarkBreakFill } from 'bootstrap-vue'
 export default {
+  components: {
+    BIconCheckCircleFill,
+    BIconXCircleFill,
+    BIconQuestionCircleFill,
+    BIconDownload,
+    BIconFileEarmarkBreakFill
+  },
+  auth: false,
   data () {
     return {
       project: {},
-      formData: {
-        decision: null,
-        observation: null
-      },
+      file: null,
+      documents: {},
+      documentsFields: ['filename', 'actions'],
       structuresFields: ['name', 'actions']
     }
   },
@@ -67,50 +104,58 @@ export default {
     },
     structures () {
       return this.project.structures || []
+    },
+    hasFile () {
+      return this.file != null
+    },
+    formData () {
+      const formData = new FormData()
+      if (this.file) {
+        formData.append('attachment', this.file)
+      }
+      return formData
     }
-    // showDecisionInput () {
-    //   // return true
-    //   return !(this.project.decision === true || this.project.decision === false)
-    // },
-    // showDecision () {
-    //   return !(this.project.observation === '' || this.project.decision == null)
-    // }
   },
   created () {
     this.$axios.$get(`/api/clients/${this.id}/project/${this.name}`)
       .then((project) => {
         this.project = project || {}
-      })
-
-    console.log(this.project)
+      }).then(() => this.$axios.$get(`/api/file/${this.name}/documents/`).then((documents) => {
+        this.documents = documents || {}
+      }))
   },
   methods: {
-    create () {
-      console.log(this.formData)
-      console.log(this.name)
-      this.$axios.$post(`/api/file/${this.name}/upload`, this.formData, {
+    upload () {
+      if (!this.hasFile) {
+        return
+      }
+
+      const promisse = this.$axios.$post(`/api/file/${this.name}/upload`, this.formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
-        .then(() => {
-          this.$router.push((`/api/clients/${this.id}/project/${this.name}`))
-        })
+
+      promisse.then(() => {
+        this.$toast.success('File uploaded!').goAway(3000)
+      })
+      promisse.catch(() => {
+        this.$toast.error('Sorry, could no upload file!').goAway(3000)
+      })
+      this.documents.push({ filename: this.file.name })
     },
-    decision () {
-      this.project.decision = this.formData.decision
-      this.project.observation = this.formData.observation
-      this.$axios.$post(`/api/clients/${this.id}/project/${this.name}`, this.formData)
-        .then(() => {
-          // this.$router.go(0)
-        }).catch((error) => {
-          this.errorMessage = error.response.data
+    downloadFile (file) {
+      const documentId = file.id
+      this.$axios.$get(`/api/file/download/${documentId}`, { responseType: 'arraybuffer' })
+        .then((filem) => {
+          const url = window.URL.createObjectURL(new Blob([filem]))
+          const link = document.createElement('a')
+          link.href = url
+          link.setAttribute('download', file.filename)
+          document.body.appendChild(link)
+          link.click()
         })
     }
-    // approve (nameProject) {
-    //   this.$axios.$post(`/api/clients/${this.id}/approve/${nameProject}`)
-    //   // console.log(nameProject)
-    // }
   }
 }
 </script>

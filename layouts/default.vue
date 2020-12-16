@@ -1,9 +1,40 @@
 <template>
   <div>
-    <Nuxt />
+    <div>
+      <b-navbar toggleable="lg" type="dark" variant="dark">
+        <b-navbar-brand>
+          Metal Construction Management
+        </b-navbar-brand>
+
+        <b-navbar-toggle target="nav-collapse" />
+
+        <b-collapse id="nav-collapse" is-nav>
+          <b-navbar-nav>
+            <b-nav-item v-if="!$auth.$state.loggedIn" href="/auth/login">
+              Login
+            </b-nav-item>
+            <b-nav-item v-if="$auth.$state.loggedIn" @click="signOut">
+              Logout
+            </b-nav-item>
+          </b-navbar-nav>
+        </b-collapse>
+      </b-navbar>
+    </div>
+    <div>
+      <Nuxt />
+    </div>
   </div>
 </template>
-
+<script>
+export default {
+  methods: {
+    signOut () {
+      this.$auth.logout()
+      this.$router.push('/')
+    }
+  }
+}
+</script>
 <style>
 html {
   font-family:
@@ -29,34 +60,5 @@ html {
 *::after {
   box-sizing: border-box;
   margin: 0;
-}
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
-
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
 }
 </style>
