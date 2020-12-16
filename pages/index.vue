@@ -6,22 +6,29 @@
         MetalConstructionManagementClient
       </h1>
       <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
+        <nuxt-link
           class="button--green"
+          to="/projects"
         >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
+          Projects
+        </nuxt-link><nuxt-link
+          class="button--green"
+          to="/structures"
         >
-          GitHub
-        </a>
+          Structures
+        </nuxt-link>
+        <nuxt-link
+          class="button--green"
+          to="/clients"
+        >
+          Clients
+        </nuxt-link>
+        <nuxt-link
+          class="button--green"
+          to="/documents"
+        >
+          Documents
+        </nuxt-link>
       </div>
     </div>
   </div>
@@ -32,15 +39,6 @@ export default {}
 </script>
 
 <style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
 .title {
   font-family:
     'Quicksand',
@@ -54,7 +52,7 @@ export default {}
     sans-serif;
   display: block;
   font-weight: 300;
-  font-size: 100px;
+  font-size: 50px;
   color: #35495e;
   letter-spacing: 1px;
 }

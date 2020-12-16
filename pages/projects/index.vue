@@ -6,8 +6,11 @@
           <nuxt-link class="btn btn-link" :to="`/projects/${row.item.name}`">
             Details
           </nuxt-link>
+          <button type="button" class="btn btn-danger" @click.prevent="deleteProject(row.item.name)">
+            Delete
+          </button>
         </template>
-      </b-table>
+</b-table>
     </b-container>
     <nuxt-link to="/projects/create">
       Create a New Project
@@ -28,6 +31,15 @@ export default {
       .then((projects) => {
         this.projects = projects
       })
+  },
+  methods: {
+    deleteProject (projectName) {
+      this.$axios.$delete(`/api/projects/${projectName}`)
+        .then(() => this.$axios.$get('/api/projects/'))
+        .then((projects) => {
+          this.projects = projects
+        })
+    }
   }
 }
 </script>
