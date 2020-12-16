@@ -3,8 +3,11 @@
     <b-container>
       <b-table striped over :items="clients" :fields="fields">
         <template v-slot:cell(actions)="row">
-          <nuxt-link class="btn btn-link" :to="`/clients/${row.item.name}`">
+          <nuxt-link class="btn btn-info" :to="`/clients/${row.item.name}`">
             Details
+          </nuxt-link>
+          <nuxt-link class="btn btn-info" :to="`/clients/${row.item.name}/projects`">
+            Client's Projects
           </nuxt-link>
         </template>
       </b-table>
