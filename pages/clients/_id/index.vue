@@ -35,6 +35,9 @@
       :filter="filter"
       striped
       hover
+      head-variant="dark"
+      sticky-header="400px"
+      responsive="md"
       :items="projects"
       :fields="projectsFields"
     >

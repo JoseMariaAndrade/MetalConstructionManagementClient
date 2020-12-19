@@ -2,44 +2,46 @@
   <b-container>
     <h4>Project Details:</h4>
     <p>Name: {{ project.name }}</p>
-    <p>Client: {{ project.client }}</p>
-    <span>    <p style="display: inline-block">Designer: {{ project.designer }}</p>
-      <b-button class="btn btn-info" @click="toggleChangeDesigner()">
-        Alterar
-      </b-button>
-      <br>
-      <span v-if="showChangeDesigner">
-        <b-form style="display:inline-block">
-          <b-form-select
-            id="designer-select"
-            v-model.trim="designer"
-            type="text"
-            required
-            value-field="name"
-          >
-            <template v-slot:first>
-              <option :value="null" disabled>
-                --- Please select the Designer ---
-              </option>
-            </template>
-            <template v-for="des in designers">
-              <option :key="des.name" :value="des.name">
-                {{ des.name }}
-              </option>
-            </template>
-          </b-form-select>
-        </b-form>
-        <b-button @click.prevent="editDesigner" class="btn btn-success">
-          Change Designer
-        </b-button>
-      </span>
-      <br><br>
-    </span>
-
-    <h6>Project Structures :</h6>
-    <b-table striped over :items="structures" :fields="fields">
+    <p>Client: {{ project.nameClient }}</p>
+    <p>Designer: {{ project.nameDesigner}}</p>
+    <nuxt-link :to="`/designers/${id}/project/${projectName}/structure/create`">
+      Create New Structure
+    </nuxt-link>
+    <h4>Structures :</h4>
+    <b-col v-show="structures.length" lg="6" class="my-1">
+      <b-form-group
+        label="Filter"
+        label-cols-sm="1"
+        label-align-sm="right"
+        label-size="sm"
+        label-for="filterInput"
+        class="mb-0"
+      >
+        <b-input-group size="sm">
+          <b-form-input
+            id="filterInput"
+            v-model="filter"
+            type="search"
+            placeholder="Type to Search"
+          />
+          <b-input-group-append>
+            <b-button :disabled="!filter" @click="filter = ''">
+              Clear
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-col>
+    <b-table
+      v-if="structures.length"
+      :filter="filter"
+      striped
+      hover
+      :items="structures"
+      :fields="fields"
+    >
       <template v-slot:cell(actions)="row">
-        <nuxt-link class="btn btn-info" :to="`/projects/${projectName}/structures/${row.item.name}`">
+        <nuxt-link class="btn btn-info" :to="`/designers/${id}/project/${projectName}/structure/${row.item.name}`">
           Details
         </nuxt-link>
         <b-button class="btn btn-danger" @click="deleteStructure(row.item.name)">
@@ -47,7 +49,10 @@
         </b-button>
       </template>
     </b-table>
-    <nuxt-link to="/projects">
+    <p v-else>
+      No Structures.
+    </p>
+    <nuxt-link :to="`/designers/${id}`">
       Go Back
     </nuxt-link>
   </b-container>
@@ -55,21 +60,26 @@
 
 <script>
 export default {
+  auth: true,
   data () {
     return {
       project: {},
       designers: [],
       designer: null,
       showChangeDesigner: false,
-      fields: ['name', 'project', 'actions']
+      fields: ['name', 'actions'],
+      filter: null
     }
   },
   computed: {
+    id () {
+      return this.$auth.user.subID
+    },
     projectName () {
       return this.$route.params.name
     },
     structures () {
-      return this.project.structures
+      return this.project.structures || []
     }
   },
   created () {
@@ -86,15 +96,8 @@ export default {
           this.project = project || {}
         })
     },
-    toggleChangeDesigner () {
-      this.$axios.$get('/api/designers/')
-        .then((designers) => {
-          this.designers = designers
-        })
-      this.showChangeDesigner = !this.showChangeDesigner
-    },
     deleteStructure (structureName) {
-      this.$axios.$delete(`/api/projects/${this.project.name}/structures/` + structureName)
+      this.$axios.$delete(`/api/projects/${this.project.name}/structures/${structureName}`)
         .then(() => this.$axios.$get(`/api/projects/${this.name}`))
         .then((project) => {
           this.project = project || {}
