@@ -30,7 +30,7 @@
         <b-form-select
           id="type-input"
           v-model="formData.typeDescription"
-          :state="isCourseValid"
+          :state="isTypeValid"
           required
           value-field="code"
           @change="getFamilies($event)"
@@ -150,7 +150,10 @@ export default {
       formData: {
         name: null,
         typeDescription: null,
-        familyName: null
+        familyName: null,
+        height: null,
+        thickness: null,
+        weight: null
       },
       families: [],
       types: []
@@ -158,7 +161,48 @@ export default {
   },
   computed: {
     id () {
-      return this.$route.params.id
+      return this.$auth.user.subID
+    },
+    invalidNameFeedback () {
+      if (!this.formData.name) {
+        return null
+      }
+      const usernameLen = this.formData.name.length
+      if (usernameLen < 3 || usernameLen > 30) {
+        return 'The name must be between [3,30] characters.'
+      }
+      return ''
+    },
+    isNameValid () {
+      if (this.invalidNameFeedback === null) {
+        return null
+      }
+
+      return this.invalidNameFeedback === ''
+    },
+    isTypeValid () {
+      if (!this.formData.typeDescription) {
+        return null
+      }
+      return this.types.some(type => this.formData.typeDescription === type.description)
+    },
+    isFamilyValid () {
+      if (!this.formData.familyName) {
+        return null
+      }
+      return this.families.some(family => this.formData.familyName === family.name)
+    },
+    isFormValid () {
+      if (!this.isNameValid) {
+        return false
+      }
+      if (!this.isTypeValid) {
+        return false
+      }
+      if (!this.isFamilyValid) {
+        return false
+      }
+      return true
     }
   },
   created () {
@@ -179,9 +223,9 @@ export default {
       this.errorMessage = false
     },
     create () {
-      this.$axios.$post('/api/clients', this.formData)
+      this.$axios.$post(`/api/${this.id}/product/create`, this.formData)
         .then(() => {
-          this.$router.push('/clients')
+          this.$router.push(`/manufacturers/${this.id}`)
         })
         .catch((error) => {
           this.errorMessage = error.response.data

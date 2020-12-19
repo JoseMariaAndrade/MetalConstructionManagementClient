@@ -10,7 +10,7 @@
             Delete
           </button>
         </template>
-</b-table>
+      </b-table>
     </b-container>
     <nuxt-link to="/projects/create">
       Create a New Project

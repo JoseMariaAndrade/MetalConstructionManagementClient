@@ -24,7 +24,7 @@ export default {
     }
   },
   created () {
-    this.$axios.$get('/api/structures')
+    this.$axios.$get('/api/structure')
       .then((structures) => {
         this.structures = structures
       })

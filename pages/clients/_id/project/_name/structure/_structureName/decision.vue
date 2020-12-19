@@ -1,14 +1,14 @@
 <template>
   <b-container>
     <b-form-group
-      label="Decicion About Project"
+      label="Decision About Structure"
     >
-      <b-form-radio v-model="formData.decision" name="some-radios" value="true">
-        Approve
-      </b-form-radio>
-      <b-form-radio v-model="formData.decision" name="some-radios" value="false">
-        Unapprove
-      </b-form-radio>
+      <b-form-radio-group
+        v-model="selected"
+        :options="options"
+        value-field="item"
+        text-field="name"
+      />
     </b-form-group>
     <b-form-textarea
       id="textarea"
@@ -25,8 +25,14 @@
 
 <script>
 export default {
+  auth: true,
   data () {
     return {
+      selected: '',
+      options: [
+        { item: true, name: 'Approve' },
+        { item: false, name: 'Deny' }
+      ],
       project: {},
       formData: {
         decision: null,
@@ -37,43 +43,33 @@ export default {
   },
   computed: {
     id () {
-      return this.$route.params.id
+      return this.$auth.user.subID
     },
     name () {
       return this.$route.params.name
     },
     structures () {
       return this.project.structures || []
+    },
+    structureName () {
+      return this.$route.params.structureName
     }
-    // showDecisionInput () {
-    //   // return true
-    //   return !(this.project.decision === true || this.project.decision === false)
-    // },
-    // showDecision () {
-    //   return !(this.project.observation === '' || this.project.decision == null)
-    // }
   },
   created () {
-    this.$axios.$get(`/api/clients/${this.id}/project/${this.name}`)
+    this.$axios.$get(`/api/clients/${this.id}/project/${this.name}/structure/${this.structureName}`)
       .then((project) => {
         this.project = project || {}
       })
+      .catch(() => {
+        this.$router.push(`/clients/${this.id}`)
+      })
   },
   methods: {
-    create () {
-      this.$axios.$post(`/api/file/${this.name}/upload`, this.formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-        .then(() => {
-          this.$router.push((`/api/clients/${this.id}/project/${this.name}`))
-        })
-    },
     decision () {
       this.project.decision = this.formData.decision
+      this.formData.decision = this.selected
       this.project.observation = this.formData.observation
-      this.$axios.$post(`/api/clients/${this.id}/project/${this.name}`, this.formData)
+      this.$axios.$post(`/api/clients/${this.id}/project/${this.name}/structure/${this.structureName}`, this.formData)
         .then(() => {
           this.$axios.$post(`/api/clients/${this.id}/email/send`, {
             project: this.name,

@@ -51,9 +51,6 @@
     <nuxt-link :to="`/manufacturers/${id}/product/create`">
       Create New Product
     </nuxt-link>
-    <nuxt-link to="/manufacturers">
-      Go Back
-    </nuxt-link>
   </b-container>
 </template>
 <script>

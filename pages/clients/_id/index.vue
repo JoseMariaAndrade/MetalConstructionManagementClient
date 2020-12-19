@@ -6,20 +6,40 @@
     <p>Contact: {{ client.contact }}</p>
     <p>Address: {{ client.address }}</p>
     <h4>Projects :</h4>
+    <b-col v-show="projects.length" lg="6" class="my-1">
+      <b-form-group
+        label="Filter"
+        label-cols-sm="1"
+        label-align-sm="right"
+        label-size="sm"
+        label-for="filterInput"
+        class="mb-0"
+      >
+        <b-input-group size="sm">
+          <b-form-input
+            id="filterInput"
+            v-model="filter"
+            type="search"
+            placeholder="Type to Search"
+          />
+          <b-input-group-append>
+            <b-button :disabled="!filter" @click="filter = ''">
+              Clear
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-col>
     <b-table
       v-if="projects.length"
+      :filter="filter"
       striped
       hover
       :items="projects"
       :fields="projectsFields"
     >
-      <template v-slot:cell(decision)="row">
-        <b-icon-question-circle-fill v-if="row.item.decision==null" />
-        <b-icon-check-circle-fill v-if="row.item.decision===true" variant="success" />
-        <b-icon-x-circle-fill v-if="row.item.decision===false" variant="danger" />
-      </template>
       <template v-slot:cell(actions)="row">
-        <nuxt-link class="btn btn-link" :to="`/clients/${id}/project/${row.item.name}`">
+        <nuxt-link v-show="row.item.availableToClient" class="btn btn-link" :to="`/clients/${id}/project/${row.item.name}`">
           Details
         </nuxt-link>
       </template>
@@ -27,28 +47,25 @@
     <p v-else>
       No Projects.
     </p>
-    <nuxt-link to="/clients">
-      Go Back
-    </nuxt-link>
   </b-container>
 </template>
 <script>
-import { BIconCheckCircleFill, BIconXCircleFill, BIconQuestionCircleFill } from 'bootstrap-vue'
 export default {
-  components: {
-    BIconCheckCircleFill,
-    BIconXCircleFill,
-    BIconQuestionCircleFill
-  },
+  auth: true,
   data () {
     return {
       client: {},
-      projectsFields: ['name', 'nameDesigner', 'decision', 'actions']
+      projectsFields: [
+        {
+          key: 'name',
+          sortable: true
+        }, { key: 'nameDesigner', sortable: true }, 'actions'],
+      filter: null
     }
   },
   computed: {
     id () {
-      return this.$route.params.id
+      return this.$auth.user.subID
     },
     projects () {
       return this.client.projects || []
@@ -58,9 +75,9 @@ export default {
     this.$axios.$get(`/api/clients/${this.id}`)
       .then((client) => {
         this.client = client || {}
+      }).catch(() => {
+        this.$router.push('/')
       })
-  },
-  methods: {
   }
 }
 </script>

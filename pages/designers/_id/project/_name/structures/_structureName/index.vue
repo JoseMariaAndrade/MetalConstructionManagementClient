@@ -13,12 +13,15 @@
         >
           Details
         </nuxt-link>
+        <b-button class="btn btn-danger" @click="deleteStructure(row.item.name)">
+          Delete
+        </b-button>
       </template>
     </b-table>
     <div v-else>
       <h6>A estrutura não tem produtos associados</h6>
     </div>
-    <nuxt-link :to="`/clients/${clientName}/projects/${projectName}`">
+    <nuxt-link :to="`/projects/${projectName}`">
       Go Back
     </nuxt-link>
   </b-container>
@@ -27,23 +30,19 @@
 export default {
   data () {
     return {
-      structure: {},
-      fields: ['family', 'manufacturer', 'name', 'type', 'actions']
+      structure: {}
     }
   },
   computed: {
-    clientName () {
-      return this.$route.params.name
-    },
     projectName () {
-      return this.$route.params.projectName
+      return this.$route.params.name
     },
     structureName () {
       return this.$route.params.structureName
     }
   },
   created () {
-    this.$axios.$get(`/api/clients/${this.clientName}/projects/${this.projectName}/structures/${this.structureName}`)
+    this.$axios.$get(`/api/projects/${this.projectName}/structures/${this.structureName}`)
       .then((structure) => {
         this.structure = structure
       })

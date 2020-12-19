@@ -35,7 +35,7 @@ export default {
       name: this.$auth.user.sub,
       file: null,
       documents: [],
-      fields: ['fileName', 'projectName']
+      fields: ['fileName', 'project']
     }
   },
   created () {
