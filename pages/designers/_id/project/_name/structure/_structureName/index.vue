@@ -5,7 +5,15 @@
     <p>Project: {{ structure.project }} </p>
 
     <h6>Structure Products :</h6>
-    <b-table v-if="structure.products" striped over :items="structure.products" :fields="fields">
+    <b-table
+      v-if="structure.products"
+      striped
+      hover
+      head-variant="dark"
+      sticky-header="400px"
+      responsive="md"
+      :items="structure.products"
+      :fields="fields">
       <template v-slot:cell(actions)="row">
         <nuxt-link
           class="btn btn-info"
@@ -21,19 +29,27 @@
     <div v-else>
       <h6>A estrutura não tem produtos associados</h6>
     </div>
-    <nuxt-link :to="`/projects/${projectName}`">
+    <nuxt-link :to="`/designers/${id}/project/${projectName}`">
       Go Back
+    </nuxt-link>
+    <nuxt-link :to="`/designers/${id}/project/${projectName}/structure/${structureName}/simulation`">
+      Simulation
     </nuxt-link>
   </b-container>
 </template>
 <script>
 export default {
+  auth: true,
   data () {
     return {
-      structure: {}
+      structure: {},
+      fields: ['name', 'type', 'family']
     }
   },
   computed: {
+    id () {
+      return this.$auth.user.subID
+    },
     projectName () {
       return this.$route.params.name
     },
@@ -42,9 +58,9 @@ export default {
     }
   },
   created () {
-    this.$axios.$get(`/api/projects/${this.projectName}/structures/${this.structureName}`)
+    this.$axios.$get(`/api/structures/${this.structureName}`)
       .then((structure) => {
-        this.structure = structure
+        this.structure = structure || {}
       })
   }
 }

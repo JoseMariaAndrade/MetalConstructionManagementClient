@@ -36,17 +36,20 @@
       :filter="filter"
       striped
       hover
+      head-variant="dark"
+      sticky-header="400px"
+      responsive="md"
       :items="projects"
       :fields="projectsFields"
     >
       <template v-slot:cell(actions)="row">
-        <nuxt-link class="btn btn-link" :to="`/designers/${id}/project/${row.item.name}`">
+        <nuxt-link class="btn btn-link small" :to="`/designers/${id}/project/${row.item.name}`">
           Details
         </nuxt-link>
-        <button type="button" class="btn btn-danger" @click.prevent="deleteProject(row.item.name)">
+        <b-button type="button" variant="danger" size="sm" @click.prevent="deleteProject(row.item.name)">
           Delete
-        </button>
-        <b-button v-show="!row.item.availableToClient" @click.prevent="makeAvailable(row.item.name)">
+        </b-button>
+        <b-button v-show="!row.item.availableToClient" type="button" variant="outline-success" size="sm" @click.prevent="makeAvailable(row.item.name)">
           Available To Client
         </b-button>
       </template>
@@ -58,10 +61,19 @@
 </template>
 <script>
 export default {
+  auth: true,
   data () {
     return {
       designer: {},
-      projectsFields: ['name', 'actions'],
+      projectsFields: [
+        {
+          key: 'name',
+          sortable: true
+        },
+        {
+          key: 'nameClient',
+          sortable: true
+        }, 'actions'],
       filter: null
     }
   },
@@ -82,9 +94,12 @@ export default {
   methods: {
     deleteProject (projectName) {
       this.$axios.$delete(`/api/projects/${projectName}`)
-        .then(() => this.$axios.$get('/api/projects/'))
-        .then((projects) => {
-          this.projects = projects
+        .then(() => {
+          this.$toast.success('Project Deleted!').goAway(2000)
+          this.projects.splice(this.projects.indexOf(projectName), 1)
+        })
+        .catch(() => {
+          this.$toast.error('Error').goAway(2000)
         })
     },
     makeAvailable (projectName) {

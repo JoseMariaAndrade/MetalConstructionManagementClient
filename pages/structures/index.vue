@@ -1,32 +1,30 @@
 <template>
-  <div>
-    <b-container>
-      <b-table striped over :items="structures" :fields="fields">
-        <template v-slot:cell(actions)="row">
-          <nuxt-link class="btn btn-link" :to="`/clients/${row.item.name}`">
-            Details
-          </nuxt-link>
-        </template>
-      </b-table>
-    </b-container>
-    <nuxt-link to="/structures/create">
-      Create a New Structure
-    </nuxt-link>
-  </div>
+  <b-container>
+    <b-table
+      striped
+      hover
+      head-variant="dark"
+      sticky-header="400px"
+      responsive="md"
+      :items="structures"
+      :fields="fields"
+    />
+  </b-container>
 </template>
 
 <script>
 export default {
+  auth: true,
   data () {
     return {
-      fields: ['name', 'client', 'designer', 'actions'],
+      fields: ['name', 'nb', 'q'],
       structures: []
     }
   },
   created () {
-    this.$axios.$get('/api/structure')
+    this.$axios.$get('/api/structures')
       .then((structures) => {
-        this.structures = structures
+        this.structures = structures || {}
       })
   }
 }
