@@ -4,8 +4,6 @@
       <b-form-group
         id="name-input-group"
         label-for="name-input"
-        :state="isNameValid"
-        :invalid-feedback="invalidNameFeedback"
         label="Name:"
         label-cols-sm="1"
         label-cols-lg="1"
@@ -14,8 +12,7 @@
           id="name-input"
           v-model.trim="product.name"
           type="text"
-          :state="isNameValid"
-          required
+          disabled
           trim
           placeholder="Enter a name"
         />
@@ -30,7 +27,7 @@
         <b-form-select
           id="type-input"
           v-model="product.type"
-          :state="isCourseValid"
+          :state="isTypeValid"
           required
           value-field="code"
           @change="getFamilies($event)"
@@ -91,7 +88,7 @@ export default {
   data () {
     return {
       formData: {
-        namew: null,
+        name: null,
         typeDescription: null,
         familyName: null
       },
@@ -110,6 +107,27 @@ export default {
     },
     name () {
       return this.$route.params.name
+    },
+    isTypeValid () {
+      if (!this.product.type) {
+        return null
+      }
+      return this.types.some(type => this.product.type === type.description)
+    },
+    isFamilyValid () {
+      if (!this.product.family) {
+        return null
+      }
+      return this.families.some(family => this.product.family === family.name)
+    },
+    isFormValid () {
+      if (!this.isTypeValid) {
+        return false
+      }
+      if (!this.isFamilyValid) {
+        return false
+      }
+      return true
     }
   },
   created () {
@@ -120,6 +138,12 @@ export default {
     this.$axios.$get('/api/types')
       .then((types) => {
         this.types = types
+      }).then(() => {
+        this.$axios.$get(`/api/types/${this.product.type}`)
+          .then((families) => {
+            this.families = families.families
+            this.formData.familyName = null
+          })
       })
   },
   methods: {
@@ -134,9 +158,9 @@ export default {
       this.errorMessage = false
     },
     create () {
-      this.$axios.$post('/api/clients', this.formData)
+      this.$axios.$put(`/api/manufacturers/${this.id}/product/${this.name}/update`, this.product)
         .then(() => {
-          this.$router.push('/clients')
+          this.$router.push(`/manufacturers/${this.id}`)
         })
         .catch((error) => {
           this.errorMessage = error.response.data

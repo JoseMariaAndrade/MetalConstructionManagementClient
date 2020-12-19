@@ -3,7 +3,6 @@
     <h4>Structure Details:</h4>
     <p>Name: {{ structure.name }}</p>
     <p>Project: {{ structure.project }} </p>
-    <p>Dimensions </p>
     <p>
       Decision:
       <b-icon-question-circle-fill v-if="structure.decision==null" />

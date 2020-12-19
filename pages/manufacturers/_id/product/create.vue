@@ -29,7 +29,7 @@
       >
         <b-form-select
           id="type-input"
-          v-model="formData.typeDescription"
+          v-model="formData.type"
           :state="isTypeValid"
           required
           value-field="code"
@@ -56,7 +56,7 @@
       >
         <b-form-select
           id="family-input"
-          v-model="formData.familyName"
+          v-model="formData.family"
           :state="isFamilyValid"
           required
           value-field="code"
@@ -73,63 +73,6 @@
           </template>
         </b-form-select>
       </b-form-group>
-      <div>
-        <b-form-group
-          id="altura-input-group"
-          label-for="altura-input"
-          label="altura:"
-          label-cols-sm="1"
-          label-cols-lg="1"
-          description="mm"
-          :invalid-feedback="invalidContactFeedback"
-        >
-          <b-form-input
-            id="altura-input"
-            v-model.trim="formData.altura"
-            :state="isContactValid"
-            type="number"
-            required
-          />
-        </b-form-group>
-      </div>
-      <div>
-        <b-form-group
-          id="espessura-input-group"
-          label-for="espessura-input"
-          label="espessura:"
-          label-cols-sm="1"
-          label-cols-lg="1"
-          description="mm"
-          :invalid-feedback="invalidContactFeedback"
-        >
-          <b-form-input
-            id="espessura-input"
-            v-model.trim="formData.espessura"
-            :state="isContactValid"
-            type="number"
-            required
-          />
-        </b-form-group>
-      </div>
-      <div>
-        <b-form-group
-          id="peso-input-group"
-          label-for="peso-input"
-          label="peso:"
-          label-cols-sm="1"
-          label-cols-lg="1"
-          description="kg/m"
-          :invalid-feedback="invalidContactFeedback"
-        >
-          <b-form-input
-            id="peso-input"
-            v-model.trim="formData.peso"
-            :state="isContactValid"
-            type="number"
-            required
-          />
-        </b-form-group>
-      </div>
     </b-form>
     <nuxt-link :to="`/manufacturers/${id}`">
       Return
@@ -149,11 +92,8 @@ export default {
     return {
       formData: {
         name: null,
-        typeDescription: null,
-        familyName: null,
-        height: null,
-        thickness: null,
-        weight: null
+        type: null,
+        family: null
       },
       families: [],
       types: []
@@ -181,16 +121,16 @@ export default {
       return this.invalidNameFeedback === ''
     },
     isTypeValid () {
-      if (!this.formData.typeDescription) {
+      if (!this.formData.type) {
         return null
       }
-      return this.types.some(type => this.formData.typeDescription === type.description)
+      return this.types.some(type => this.formData.type === type.description)
     },
     isFamilyValid () {
-      if (!this.formData.familyName) {
+      if (!this.formData.family) {
         return null
       }
-      return this.families.some(family => this.formData.familyName === family.name)
+      return this.families.some(family => this.formData.family === family.name)
     },
     isFormValid () {
       if (!this.isNameValid) {
@@ -216,14 +156,14 @@ export default {
       this.$axios.$get(`/api/types/${value}`)
         .then((families) => {
           this.families = families.families
-          this.formData.familyName = null
+          this.formData.family = null
         })
     },
     reset () {
       this.errorMessage = false
     },
     create () {
-      this.$axios.$post(`/api/${this.id}/product/create`, this.formData)
+      this.$axios.$post(`/api/manufacturers/${this.id}/product/create`, this.formData)
         .then(() => {
           this.$router.push(`/manufacturers/${this.id}`)
         })

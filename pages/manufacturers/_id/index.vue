@@ -33,6 +33,9 @@
       :filter="filter"
       striped
       hover
+      head-variant="dark"
+      sticky-header="800px"
+      responsive="md"
       :items="products"
       :fields="productsFields"
     >
@@ -91,7 +94,6 @@ export default {
   methods: {
     deleteProduct (product) {
       this.$axios.$delete(`/api/manufacturers/${this.id}/product/${product.name}`)
-      // this.$delete(this.products, product)
       this.products.splice(this.products.indexOf(product), 1)
     }
   }
